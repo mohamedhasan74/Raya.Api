@@ -25,12 +25,7 @@ namespace Raya.Repository
            await _context.Set<T>().AddAsync(entity);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
-        {
-            return await _context.Set<T>().ToListAsync();
-        }
-
-        public async Task<IEnumerable<T>> GetAllByConditionAsync(ISpecification<T> spec)
+        public async Task<IEnumerable<T>> GetAllAsync(ISpecification<T> spec)
         {
             return await SpecificationEvaluator<T>.GetQuery(_context.Set<T>(), spec).ToListAsync();
         }
@@ -40,8 +35,7 @@ namespace Raya.Repository
             return await _context.Set<T>().FindAsync(id);
         }
 
-
-        public void Remove(T entity)
+        public void Delete(T entity)
         {
             _context.Set<T>().Remove(entity);
         }

@@ -23,67 +23,63 @@ namespace Raya.Api.Controllers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+        [ProducesResponseType(typeof(ApiSuccessResponse), 200)]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
+        public async Task<ActionResult> GetAll([FromQuery] ProductSpecParams queryParams)
         {
-            var products = await _unitOfWork.Repository<Product>().GetAllAsync();
-            var productsDto = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
-            return Ok(productsDto);
+            var spec = new ProductsByConditionSpec(queryParams);
+            var products = await _unitOfWork.Repository<Product>().GetAllAsync(spec);
+            var productsDto = _mapper.Map<IEnumerable<Product>, IEnumerable<Product>>(products);
+            return Ok(new ApiSuccessResponse { Success = true, Data = productsDto });
         }
+
+        [ProducesResponseType(typeof(ApiSuccessResponse), 200)]
+        [ProducesResponseType(typeof(ApiFailResponse), 404)]
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductDto>> GetById(int id)
+        public async Task<ActionResult> GetById(int id)
         {
             var product = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
-            if (product is null) return NotFound(new ApiErrorResponse(404, "Product Was Not Found"));
+            if (product is null) return Ok(new ApiFailResponse { Success = false, Error = new ApiErrorResponse(404, "Product Not Found")});
             var productDto = _mapper.Map<Product, ProductDto>(product);
-            return Ok(productDto);
+            return Ok(new ApiSuccessResponse { Success = true, Data = productDto});
         }
-        [HttpGet("FilterByName/{name}")]
-        public async Task<ActionResult<ProductDto>> GetAllByName(string name)
-        {
-            var spec = new BaseSpecification<Product>(P => P.Name.ToLower().Contains(name.ToLower()));
-            var products = await _unitOfWork.Repository<Product>().GetAllByConditionAsync(spec);
-            var productsDto = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
-            return Ok(productsDto);
-        }
-        [HttpGet("FilterByPrice/{price}")]
-        public async Task<ActionResult<ProductDto>> GetAllByName(int price)
-        {
-            var spec = new BaseSpecification<Product>(P => P.Price == price);
-            var products = await _unitOfWork.Repository<Product>().GetAllByConditionAsync(spec);
-            var productsDto = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
-            return Ok(productsDto);
-        }
+
+        [ProducesResponseType(typeof(ApiSuccessResponse), 200)]
+        [ProducesResponseType(typeof(ApiFailResponse), 404)]
         [HttpDelete]
-        public async Task<ActionResult> RemoveProduct(int id)
+        public async Task<ActionResult> DeleteProduct(int id)
         {
             var product = await _unitOfWork.Repository<Product>().GetByIdAsync(id);
-            if(product is null) return NotFound(new ApiErrorResponse(404, "Product Was Not Found"));
-            _unitOfWork.Repository<Product>().Remove(product);
+            if(product is null) return Ok(new ApiFailResponse { Success = false, Error = new ApiErrorResponse(404, "Product Not Found")});
+            _unitOfWork.Repository<Product>().Delete(product);
             await _unitOfWork.CompleteAsyn();
-            return Ok(new { message = "Product Is Deleted" });
+            return Ok(new ApiSuccessResponse { Success = true, Data = "Product Is Deleted"});
         }
+
+        [ProducesResponseType(typeof(ApiSuccessResponse), 200)]
+        [ProducesResponseType(typeof(ApiFailResponse), 404)]
         [HttpPut]
         public async Task<ActionResult> UpdateProduct(ProductDto productDto)
         {
             var product = await _unitOfWork.Repository<Product>().GetByIdAsync(productDto.Id);
-            if (product is null) return NotFound(new ApiErrorResponse(404, "Product Was Not Found"));
+            if (product is null) return Ok(new ApiFailResponse { Success = false, Error = new ApiErrorResponse(404, "Product Not Found") });
             try {
                 _mapper.Map(productDto, product);
                 _unitOfWork.Repository<Product>().Update(product);
                 await _unitOfWork.CompleteAsyn();
-                return Ok(new { message = "Product Is Updated" });
-            } catch(DbUpdateException ex)
+                return Ok(new ApiSuccessResponse { Success = true, Data = "Product Is Updated" });
+            }
+            catch (DbUpdateException ex)
             {
-                if (ex.InnerException is SqlException sqlException &&
-                (sqlException.Number == 2601 || sqlException.Number == 2627))
-                return BadRequest(new ApiErrorResponse(400, "Product Is Already Exists"));
-                return BadRequest(new ApiErrorResponse(400));
-            } catch(Exception ex)
+                return Ok(new ApiFailResponse { Success = false, Error = new ApiErrorResponse(400, "Product Is Already Exists") });
+            }
+            catch (Exception ex)
             {
-              return BadRequest(new ApiErrorResponse(400));
+                return Ok(new ApiFailResponse { Success = false, Error = new ApiErrorResponse(400, "Error occurred During Update Product") });
             }
         }
+        [ProducesResponseType(typeof(ApiSuccessResponse), 200)]
+        [ProducesResponseType(typeof(ApiFailResponse), 400)]
         [HttpPost]
         public async Task<ActionResult> AddProduct(ProductAddDto productDto)
         {
@@ -92,20 +88,19 @@ namespace Raya.Api.Controllers
             {
                 await _unitOfWork.Repository<Product>().AddAsync(product);
                 await _unitOfWork.CompleteAsyn();
-                return Ok(new { message = "Product Is Added" });
+                return Ok(new ApiSuccessResponse { Success = true, Data = "Product Is Added"});
             }
             catch (DbUpdateException ex)
             {
-                if (ex.InnerException is SqlException sqlException &&
-                (sqlException.Number == 2601 || sqlException.Number == 2627))
-                    return BadRequest(new ApiErrorResponse(400, "Product Is Already Exists"));
-                return BadRequest(new ApiErrorResponse(400));
+                return Ok(new ApiFailResponse { Success = false, Error = new ApiErrorResponse(400, "Product Is Already Exists") });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiErrorResponse(400));
+                return Ok(new ApiFailResponse { Success = false, Error = new ApiErrorResponse(400, "Error occurred During Add Product") });
             }
         }
 
+
+        
     }
 }

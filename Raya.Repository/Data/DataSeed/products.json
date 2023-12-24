@@ -15,7 +15,7 @@
     "Name": "Asus ROG Phone 6",
     "Description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.",
     "Price": 100,
-    "Quantity": 100
+    "Quantity": 0
   },
   {
     "Name": "Nubia Red Magic 7S Pro",
@@ -27,13 +27,13 @@
     "Name": "Black Shark 5 Pro",
     "Description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.",
     "Price": 200,
-    "Quantity": 125
+    "Quantity": 0
   },
   {
     "Name": "Oppo Find X5 Pro",
     "Description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.",
     "Price": 432,
-    "Quantity": 256
+    "Quantity": 0
   },
   {
     "Name": "Xiaomi 12 Pro",
@@ -45,7 +45,7 @@
     "Name": "Realme C53",
     "Description": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.",
     "Price": 346,
-    "Quantity": 167
+    "Quantity": 0
   },
   {
     "Name": "Infinix Zero 30",

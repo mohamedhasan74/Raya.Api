@@ -11,11 +11,10 @@ namespace Raya.Core.Interfaces
 {
     public interface IGenericRepository <T> where T : BaseEntity
     {
-        Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(int id);
-        Task<IEnumerable<T>> GetAllByConditionAsync(ISpecification<T> spec);
+        Task<IEnumerable<T>> GetAllAsync(ISpecification<T> spec);
         Task AddAsync(T entity);
-        void Remove(T entity);
+        void Delete(T entity);
         void Update(T entity);
     }
 }
